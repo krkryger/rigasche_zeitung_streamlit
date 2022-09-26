@@ -23,7 +23,11 @@ def plot():
 
     fig, ax = plt.subplots(figsize=(15,7))
 
-    df[st.session_state.places_to_plot].plot(ax=ax)
+    if st.session_state.rolling == 0:
+        df[st.session_state.places_to_plot].plot(ax=ax)
+    else:
+        for name in st.session_state.places_to_plot:
+
 
     plt.xticks(ticks=range(1802,1889), labels=[str(yr) if yr%5==0 else '' for yr in range(1802,1889)], size=14)
     plt.ylabel('days', size=16)
@@ -55,12 +59,12 @@ if 'download_fig' not in st.session_state:
 img = None    
 
 
-st.write('Average time of news movement per year')
+st.write('Average time for news to reach Riga')
 
 with st.form(key='my_form'):
     with st.sidebar:
 
-        places_input = st.sidebar.multiselect(label='Choose locations:',
+        places_input = st.sidebar.multiselect(label='Choose locations (dropdown or type):',
                                             options=df.columns,
                                             key='places_to_plot')
 
