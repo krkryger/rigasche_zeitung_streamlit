@@ -179,6 +179,7 @@ with st.form(key='plot2'):
 
     jitter = st.checkbox(label='Jitter dots',
                             key='jitter',
+                            value=state.jitter,
                             help='Uncheck this box to stop jittering (nudging) the dots4')
     
     submit_scatter = st.form_submit_button(label='Show')
