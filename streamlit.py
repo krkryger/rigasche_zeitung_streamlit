@@ -58,6 +58,7 @@ def plot():
         df[name].rolling(state.rolling, min_periods=1).mean().reindex(range(1802,1889)).plot(label=label)
 
     plt.xticks(ticks=range(1802,1889), labels=[str(yr) if yr%5==0 else '' for yr in range(1802,1889)], size=14)
+    plt.yticks(size=14)
     plt.ylabel('days', size=16)
     plt.grid(which='major', linewidth=1.2)                
     plt.legend(fontsize=14, loc='upper right',
@@ -95,6 +96,7 @@ def plot_speed_distribution(place=state.scatterplot_place, jitter=state.jitter, 
         jitter_dots(dots)
         
     plt.xticks(ticks=range(1802,1889), labels=[str(yr) if yr%5==0 else '' for yr in range(1802,1889)], size=14)
+    plt.yticks(size=14)
     plt.ylabel('days', size=16)
     plt.grid(which='major', linewidth=1.2)
     plt.legend(fontsize=14, loc='upper right')
