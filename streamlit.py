@@ -178,7 +178,6 @@ with st.form(key='plot2'):
                                     help= 'Maximum value to be displayed')
 
     jitter = st.checkbox(label='Jitter dots',
-                            value=True,
                             key='jitter',
                             help='Uncheck this box to stop jittering (nudging) the dots4')
     
