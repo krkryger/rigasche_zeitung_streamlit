@@ -247,7 +247,7 @@ if topic:
 
     st.markdown('#### Examples')
 
-    tabs = st.tabs([str(i)+'    ' for i in range(1, 21)])
+    tabs = st.tabs([str(i)+'    ' for i in range(1, len(topic_examples)+1)])
 
     for tab, ex in zip(tabs, range(20)):
 
