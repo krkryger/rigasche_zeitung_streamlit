@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+from PIL import Image
 
 st.set_page_config(layout="centered")
 state = st.session_state
@@ -195,4 +196,72 @@ else:
 
 if img_scatter:
     st.download_button(label='Download', data=img_scatter, file_name=f'{state.scatterplot_place}.png')
+
+
+
+st.header('Topics')
+st.markdown("""The articles following the places and dates can also be modeled thematically.
+Using top2vec ([D. Angelov, 2020](https://top2vec.readthedocs.io/en/stable/Top2Vec.html#usage), about 200 000 segments of text were divided into 352 topics)""")
+
+#with st.form(key='topics'):
+
+topic_reduction = st.slider(label='Number of topics',
+                            min_value=30,
+                            max_value=50,
+                            step=10,
+                            key='reduction',
+                            help= 'Choose the number of topics to reduce the original 423 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
+
+topic = st.slider(label='Choose a topic:',
+                  min_value=1,
+                  max_value=topic_reduction)
+    
+#submit_reduction = st.form_submit_button(label='Show')
+
+if topic_reduction:
+    
+    with open(f'data/topics/reduction_{str(topic_reduction)}/sizes.json', 'r', encoding='utf8') as f:
+        sizes = json.load(f)
+
+
+if topic:
+
+    st.subheader(f'Topic {topic}')
+
+    st.markdown(f'**Size: {sizes[topic]} segments**')
+
+    wordcloud = Image.open(f'data/topics/reduction_{str(topic_reduction)}/wordclouds/{str(topic-1)}.png')
+    st.image(wordcloud)
+
+    statistics = Image.open(f'data/topics/reduction_{str(topic_reduction)}/statistics/topic_{str(topic-1)}.png')
+    st.image(statistics)
+
+    with open(f'data/topics/reduction_{str(topic_reduction)}/examples/examples_{str(topic-1)}.json', 'r', encoding='utf8') as f:
+        topic_examples = json.load(f)
+        #current_example = 0
+
+    st.markdown('#### Examples')
+
+    tabs = st.tabs([str(i)+'    ' for i in range(1, 21)])
+
+    for tab, ex in zip(tabs, range(20)):
+
+        with tab:
+
+            example_data = topic_examples[ex]
+            date = example_data['date']
+            heading = example_data['heading']
+            text = example_data['text']
+            text = text.replace('\n\n\t', '\n\n')
+            text = text.replace('\n\n', '_\n\n_')
+
+            st.markdown(f"##### {heading}")
+            st.markdown(f"**{date}**")
+            st.markdown(f"\n_{text.strip().lstrip()}_")
+
+
+
+    
+
+
 
