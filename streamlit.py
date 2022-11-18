@@ -31,6 +31,8 @@ if 'scatterplot_place' not in state:
     state.scatterplot_place = 'Paris'
 if 'jitter' not in state:
     state.jitter = True
+if 'display_season' not in state:
+    state.display_season = False
 if 'cutoff' not in state:
     state.cutoff = 100
 if 'scatterplot_figure' not in state:
@@ -84,17 +86,21 @@ def jitter_dots(dots):
     dots.set_offsets(jittered_offsets)
 
 
-def plot_speed_distribution(place=state.scatterplot_place, jitter=state.jitter, cutoff=state.cutoff):
+def plot_speed_distribution(place=state.scatterplot_place, jitter=state.jitter, cutoff=state.cutoff, display_season=state.display_season):
     
     fig = plt.figure(figsize=(15,7))
     
     data = pd.read_csv(f'data/places/{place}.tsv', sep='\t', encoding='utf8')
     if cutoff:
         data = data.loc[data.delta <= cutoff]
-    
-    dots = plt.scatter(x=data.year, y=data.delta, s=3, label=place, alpha=0.6)
+
+    dots = plt.scatter(x=data.year, y=data.delta, s=5, label=place, alpha=0.6)
     if jitter:
         jitter_dots(dots)
+
+    if display_season:
+        data.loc[data.season=='s'].groupby('year')['delta'].mean().rolling(3).mean().reindex(range(1802,1889)).plot(color='red', alpha=0.7, label='Apr-Sep')
+        data.loc[data.season=='w'].groupby('year')['delta'].mean().rolling(3).mean().reindex(range(1802,1889)).plot(color='blue', alpha=0.7, label='Oct-Mar')
         
     plt.xticks(ticks=range(1802,1889), labels=[str(yr) if yr%5==0 else '' for yr in range(1802,1889)], size=14)
     plt.yticks(size=14)
@@ -176,13 +182,18 @@ with st.form(key='plot2'):
 
     cutoff = st.slider(label='Cutoff',
                                     min_value=30,
-                                    max_value=150,
+                                    max_value=100,
+                                    step=10,
                                     key='cutoff',
                                     help= 'Maximum value to be displayed')
 
     jitter = st.checkbox(label='Jitter dots',
                             key='jitter',
                             help='Uncheck this box to stop jittering (nudging) the dots4')
+
+    display_season = st.checkbox(label='Display seasons',
+                                key='display_season',
+                                help='Distinguish between winter and summer')                            
     
     submit_scatter = st.form_submit_button(label='Show')
 
