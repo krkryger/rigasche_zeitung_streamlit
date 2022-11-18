@@ -217,16 +217,16 @@ With Top2Vec, it is possible to reduce the number of topics by merging them into
 This widget allows you to choose the preferred level of detail (30, 40 or 50 topics).
 Each topic is presented in the form of a wordcloud where the size of words is indicative of how relevant/unique they are to the chosen topic.
 You can also examine the temporal distribution of the topic, as well as the main article headings it appears under.
-Further down, you can read 20 example texts for each topic, which are ordered by their centrality in the topic.""")
+Further down, you can read example texts for each topic, which are ordered by their centrality in the topic.""")
 
 #with st.form(key='topics'):
 
 topic_reduction = st.slider(label='Number of topics',
                             min_value=30,
-                            max_value=50,
+                            max_value=60,
                             step=10,
                             key='reduction',
-                            help= 'Choose the number of topics to reduce the original 423 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
+                            help= 'Choose the number of topics to reduce the original 351 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
 
 topic = st.slider(label='Choose a topic:',
                   min_value=1,
@@ -244,7 +244,7 @@ if topic:
 
     st.subheader(f'Topic {topic}')
 
-    st.markdown(f'**Size: {sizes[topic]} segments**')
+    st.markdown(f'**Size: {sizes[topic-1]} segments**')
 
     wordcloud = Image.open(f'data/topics/reduction_{str(topic_reduction)}/wordclouds/{str(topic-1)}.png')
     st.image(wordcloud)
