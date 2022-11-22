@@ -214,19 +214,17 @@ st.header('Topics')
 st.markdown("""The articles following the places and dates can also be modeled thematically.
 Using top2vec ([D. Angelov, 2020](https://top2vec.readthedocs.io/en/stable/Top2Vec.html#usage), about 200 000 segments of text were divided into 352 topics.
 With Top2Vec, it is possible to reduce the number of topics by merging them into each other by order of similarity.
-This widget allows you to choose the preferred level of detail (30, 40 or 50 topics).
+This widget allows you to choose the preferred level of detail (30, 40 50 or 60 topics).
 Each topic is presented in the form of a wordcloud where the size of words is indicative of how relevant/unique they are to the chosen topic.
 You can also examine the temporal distribution of the topic, as well as the main article headings it appears under.
 Further down, you can read example texts for each topic, which are ordered by their centrality in the topic.""")
 
 #with st.form(key='topics'):
 
-topic_reduction = st.slider(label='Number of topics',
-                            min_value=30,
-                            max_value=60,
-                            step=10,
-                            key='reduction',
-                            help= 'Choose the number of topics to reduce the original 351 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
+topic_reduction = st.selectbox(label='Number of topics',
+                               options=[15,30,60],
+                               key='reduction',
+                               help= 'Choose the number of topics to reduce the original 351 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
 
 topic = st.slider(label='Choose a topic:',
                   min_value=1,
