@@ -1,4 +1,5 @@
 import io
+import os
 import json
 import streamlit as st
 import pandas as pd
@@ -45,6 +46,10 @@ def load_data():
     df = pd.read_csv('data/streamlit_data.tsv', sep='\t', encoding='utf8', index_col='Unnamed: 0')
     return df, df.columns
 
+st.cache()
+def load_hierarchy():
+    hierarchy = pd.read_csv('data/topics/topic_hierarchy.tsv', sep='\t', encoding='utf8')
+    return hierarchy
 
 st.cache()
 def define_font():
@@ -75,7 +80,6 @@ def plot():
 
 def create_filename():
     return '_'.join(state.places_to_plot) + '.png'
-
 
 
 def jitter_dots(dots):
@@ -114,8 +118,30 @@ def plot_speed_distribution(place=state.scatterplot_place, jitter=state.jitter, 
     return img_scatter
 
 
+def find_parents(top, hierarchy):
+    
+    family = hierarchy.loc[hierarchy.isin([top]).any(axis=1)].values
+    
+    topic_level = np.where(family==top)[1][0]
+    
+    if topic_level == 0:
+        parent = None
+        children = list(set(family[:, 1]))
+        
+    elif topic_level == family.shape[1]-1:
+        parent = list(set(family[:, topic_level-1]))
+        children = None
+        
+    else:
+        parent = list(set(family[:, topic_level-1]))
+        children = list(set(family[:, topic_level+1]))
+                  
+    return parent, children    
+
+
 
 df, placenames = load_data()
+hierarchy = load_hierarchy()
 define_font()
 
 img = None   
@@ -219,16 +245,18 @@ Each topic is presented in the form of a wordcloud where the size of words is in
 You can also examine the temporal distribution of the topic, as well as the main article headings it appears under.
 Further down, you can read example texts for each topic, which are ordered by their centrality in the topic.""")
 
-#with st.form(key='topics'):
+reductions = [0] + [int(folder.split('_')[1]) for folder in os.listdir(os.getcwd()+'/data/topics') if 'reduction' in folder]
 
-topic_reduction = st.selectbox(label='Number of topics',
-                               options=[15,30,60],
+#reductions = [0, 12, 36, 72]
+
+topic_reduction = st.radio(label='Number of topics',
+                               options=reductions[1:],
                                key='reduction',
                                help= 'Choose the number of topics to reduce the original 351 topics to. Choosing a lower number means that the topics are more general; higher number results in more detailed topics.')
 
 topic = st.slider(label='Choose a topic:',
-                  min_value=1,
-                  max_value=topic_reduction)
+                  min_value=sum(reductions[:reductions.index(topic_reduction)])+1,
+                  max_value=sum(reductions[:reductions.index(topic_reduction)])+topic_reduction)
     
 #submit_reduction = st.form_submit_button(label='Show')
 
@@ -242,9 +270,15 @@ if topic:
 
     st.subheader(f'Topic {topic}')
 
-    st.markdown(f'**Size: {sizes[topic-1]} segments**')
+    st.markdown(f'**Size: {sizes[topic-1-sum(reductions[:reductions.index(topic_reduction)])]} segments**')
 
-    wordcloud = Image.open(f'data/topics/reduction_{str(topic_reduction)}/wordclouds/{str(topic-1)}.png')
+    parent, children = find_parents(topic, hierarchy)
+    if parent is not None:
+        st.markdown(f'Parent topic{"s" if len(parent) > 1 else ""}: {", ".join([str(p) for p in parent])}')
+    if children is not None:
+        st.markdown(f'Child topic{"s" if len(children) > 1 else ""}: {", ".join([str(c) for c in children])}')
+
+    wordcloud = Image.open(f'data/topics/reduction_{str(topic_reduction)}/wordclouds/topic_{str(topic-1)}.png')
     st.image(wordcloud)
 
     statistics = Image.open(f'data/topics/reduction_{str(topic_reduction)}/statistics/topic_{str(topic-1)}.png')
