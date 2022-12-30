@@ -245,7 +245,7 @@ Each topic is presented in the form of a wordcloud where the size of words is in
 You can also examine the temporal distribution of the topic, as well as the main article headings it appears under.
 Further down, you can read example texts for each topic, which are ordered by their centrality in the topic.""")
 
-reductions = [0] + [int(folder.split('_')[1]) for folder in os.listdir(os.getcwd()+'/data/topics') if 'reduction' in folder]
+reductions = [0] + sorted([int(folder.split('_')[1]) for folder in os.listdir(os.getcwd()+'/data/topics') if 'reduction' in folder])
 
 #reductions = [0, 12, 36, 72]
 
